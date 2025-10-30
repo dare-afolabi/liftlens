@@ -1,0 +1,36 @@
+
+site_name: liftlens
+site_url: https://liftlens.readthedocs.io
+site_description: Documentation for liftlens - An Enterprise-grade A/B Testing 
+site_author: Dare Afolabi
+
+theme:
+  name: material
+  features:
+    - content.code.annotate
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - toc.follow
+  palette:
+    primary: blue
+    accent: cyan
+
+nav:
+  - Home: index.md
+  - User Guide: user_guide.md
+  - API Reference: api_reference.md
+  - Contributing: contributing.md
+
+plugins:
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            members_order: source
+
+repo_url: https://github.com/dare-afolabi/liftlens
+edit_uri: edit/main/docs/
+
+

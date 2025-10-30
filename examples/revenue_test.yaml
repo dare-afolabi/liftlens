@@ -1,0 +1,32 @@
+
+name: Revenue Lift Test
+data:
+  type: csv
+  path: data/synthetic.csv
+baseline_col: baseline
+outcome_col: outcome
+group_col: group
+control_label: control
+treatment_label: treatment
+metrics:
+  - name: revenue_lift
+    type: primary
+    func: mean_diff
+    weight: 1.0
+  - name: arpu
+    type: primary
+    func: ratio_metric
+    params:
+      denominator_col: users
+transform:
+  winsorize: [0.01, 0.01]
+  cuped: true
+  log_transform: false
+stats:
+  alpha: 0.05
+  sequential: true
+report:
+  format: html
+  interactive: true
+
+

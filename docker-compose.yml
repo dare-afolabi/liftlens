@@ -1,0 +1,38 @@
+
+version: "3.9"
+
+services:
+  liftlens:
+    build: .
+    ports:
+      - "8000:8000"
+      - "8501:8501"
+    volumes:
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - LIFTLENS_LOG_LEVEL=INFO
+      - LIFTLENS_PARALLEL_BACKEND=joblib
+      - LIFTLENS_API_KEY=${LIFTLENS_API_KEY:-dev-key-change-in-prod}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: liftlens
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+
+
