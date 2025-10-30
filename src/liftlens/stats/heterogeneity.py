@@ -1,4 +1,3 @@
-
 from typing import Any, cast
 
 import numpy as np
@@ -8,10 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 
 def subgroup_analysis(
-    df: pd.DataFrame,
-    metric_col: str,
-    group_col: str,
-    subgroups: list[str]
+    df: pd.DataFrame, metric_col: str, group_col: str, subgroups: list[str]
 ) -> dict[str, Any]:
     """
     Estimate treatment effect per subgroup.
@@ -22,8 +18,10 @@ def subgroup_analysis(
             subset = df[df[col] == val]
             if len(subset) < 10:
                 continue
-            effect = subset[subset[group_col] == "treatment"][metric_col].mean() - \
-                     subset[subset[group_col] == "control"][metric_col].mean()
+            effect = (
+                subset[subset[group_col] == "treatment"][metric_col].mean()
+                - subset[subset[group_col] == "control"][metric_col].mean()
+            )
             key = f"{col}={val}"
             results[key] = float(effect)
     logger.info(f"Subgroup analysis: {len(results)} subgroups")
@@ -31,10 +29,7 @@ def subgroup_analysis(
 
 
 def causal_forest_effect(
-    df: pd.DataFrame,
-    treatment_col: str,
-    outcome_col: str,
-    feature_cols: list[str]
+    df: pd.DataFrame, treatment_col: str, outcome_col: str, feature_cols: list[str]
 ) -> np.ndarray:
     """
     Estimate heterogeneous treatment effects using Causal Forest.
@@ -62,7 +57,7 @@ def meta_learner_effect(
     treatment_col: str,
     outcome_col: str,
     feature_cols: list[str],
-    learner_type: str = "s-learner"
+    learner_type: str = "s-learner",
 ) -> np.ndarray:
     """
     S-Learner, T-Learner, or X-Learner for HTE.
@@ -90,5 +85,3 @@ def meta_learner_effect(
     cate = learner.effect(X)
     logger.info(f"{learner_type.upper()}-Learner: CATE estimated")
     return cast(np.ndarray, cate)
-
-

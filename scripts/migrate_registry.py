@@ -2,6 +2,7 @@
 """
 Migrate old registry format to current SQLite schema.
 """
+
 import json
 import sqlite3
 from pathlib import Path
@@ -29,11 +30,19 @@ def migrate(old_path: Path, new_path: Path):
         old_data = json.load(f)
 
     for run in old_data.get("runs", []):
-        conn.execute("""
+        conn.execute(
+            """
             INSERT OR REPLACE INTO experiments
             (run_id, name, config_json, results_json)
             VALUES (?, ?, ?, ?)
-        """, (run["run_id"], run["name"], json.dumps(run["config"]), json.dumps(run["results"])))
+        """,
+            (
+                run["run_id"],
+                run["name"],
+                json.dumps(run["config"]),
+                json.dumps(run["results"]),
+            ),
+        )
 
     conn.commit()
     logger.success(f"Migrated {len(old_data['runs'])} runs to {new_path}")
@@ -41,6 +50,7 @@ def migrate(old_path: Path, new_path: Path):
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--old", type=Path, default=".liftlens_registry.json")
     parser.add_argument("--new", type=Path, default=".liftlens_registry.sqlite")

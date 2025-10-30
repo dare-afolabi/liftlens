@@ -1,4 +1,3 @@
-
 from collections.abc import Callable
 from typing import Any
 
@@ -60,15 +59,16 @@ def conversion_rate(df: pd.DataFrame, group_col: str, metric_col: str) -> float:
     return mean_diff(df, group_col, metric_col)
 
 
-def ratio_metric(df: pd.DataFrame, group_col: str, metric_col: str, denominator_col: str) -> float:
+def ratio_metric(
+    df: pd.DataFrame, group_col: str, metric_col: str, denominator_col: str
+) -> float:
     """
     Ratio metric: (sum(numerator) / sum(denominator)) per group
     """
     grouped = df.groupby(group_col).agg(
-        num=(metric_col, 'sum'),
-        den=(denominator_col, 'sum')
+        num=(metric_col, "sum"), den=(denominator_col, "sum")
     )
-    grouped['ratio'] = grouped['num'] / grouped['den']
+    grouped["ratio"] = grouped["num"] / grouped["den"]
     control_ratio = grouped.loc["control", "ratio"]
     treatment_ratio = grouped.loc["treatment", "ratio"]
     return float(treatment_ratio - control_ratio)
@@ -90,13 +90,15 @@ def make_ratio_metric(numerator: str, denominator: str) -> Callable[..., float]:
     Factory to create parameterized ratio metric.
     Usage: registry.call("revenue_per_user", df, "group", "revenue", denominator_col="users")
     """
-    def metric(df: pd.DataFrame, group_col: str, metric_col: str, **kwargs: Any) -> float:
+
+    def metric(
+        df: pd.DataFrame, group_col: str, metric_col: str, **kwargs: Any
+    ) -> float:
         denom = kwargs.get("denominator_col")
         if not denom:
             raise ValueError("denominator_col required for ratio metric")
         return ratio_metric(df, group_col, metric_col, denom)
+
     metric.__name__ = f"{numerator}_per_{denominator}"
     metric.__doc__ = f"{numerator} per {denominator}: ratio(treatment) - ratio(control)"
     return metric
-
-

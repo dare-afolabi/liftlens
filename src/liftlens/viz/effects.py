@@ -1,4 +1,3 @@
-
 from typing import Any, cast
 
 import pandas as pd
@@ -7,8 +6,7 @@ from loguru import logger
 
 
 def forest_plot(
-    effects: list[dict[str, Any]],
-    title: str = "Treatment Effects"
+    effects: list[dict[str, Any]], title: str = "Treatment Effects"
 ) -> dict[str, Any]:
     """
     Forest plot for multiple metrics or subgroups.
@@ -22,40 +20,47 @@ def forest_plot(
     fig = go.Figure()
 
     # Error bars
-    fig.add_trace(go.Scatter(
-        x=ci_low, y=names,
-        mode='lines',
-        line={"color": 'black', "width": 1},
-        showlegend=False
-    ))
-    fig.add_trace(go.Scatter(
-        x=ci_high, y=names,
-        mode='lines',
-        line={"color": 'black', "width": 1},
-        showlegend=False
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=ci_low,
+            y=names,
+            mode="lines",
+            line={"color": "black", "width": 1},
+            showlegend=False,
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=ci_high,
+            y=names,
+            mode="lines",
+            line={"color": "black", "width": 1},
+            showlegend=False,
+        )
+    )
 
     # Point estimates
-    fig.add_trace(go.Scatter(
-        x=estimates, y=names,
-        mode='markers',
-        marker={"color": 'blue', "size": 8},
-        error_x={
-            "type": 'data',
-            "symmetric": False,
-            "array": [e["ci_upper"] - e["estimate"] for e in effects],
-            "arrayminus": [e["estimate"] - e["ci_lower"] for e in effects]
-        },
-        name="Effect"
-    ))
+    fig.add_trace(
+        go.Scatter(
+            x=estimates,
+            y=names,
+            mode="markers",
+            marker={"color": "blue", "size": 8},
+            error_x={
+                "type": "data",
+                "symmetric": False,
+                "array": [e["ci_upper"] - e["estimate"] for e in effects],
+                "arrayminus": [e["estimate"] - e["ci_lower"] for e in effects],
+            },
+            name="Effect",
+        )
+    )
 
     # Zero line
     fig.add_vline(x=0, line_dash="dash", line_color="gray")
 
     fig.update_layout(
-        title=title,
-        xaxis_title="Effect Size",
-        yaxis={"autorange": "reversed"}
+        title=title, xaxis_title="Effect Size", yaxis={"autorange": "reversed"}
     )
 
     logger.debug("Forest plot generated")
@@ -63,10 +68,7 @@ def forest_plot(
 
 
 def lift_curve(
-    df: pd.DataFrame,
-    metric_col: str,
-    group_col: str = "group",
-    n_bins: int = 10
+    df: pd.DataFrame, metric_col: str, group_col: str = "group", n_bins: int = 10
 ) -> dict[str, Any]:
     """Cumulative lift by percentile."""
     df = df.copy()
@@ -76,18 +78,12 @@ def lift_curve(
     lift = lift.reset_index()
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=lift["percentile"],
-        y=lift["lift"],
-        name="Lift"
-    ))
+    fig.add_trace(go.Bar(x=lift["percentile"], y=lift["lift"], name="Lift"))
 
     fig.update_layout(
         title=f"Cumulative Lift by {metric_col} Percentile",
         xaxis_title="Percentile",
-        yaxis_title="Relative Lift"
+        yaxis_title="Relative Lift",
     )
 
     return cast(dict[str, Any], fig.to_dict())
-
-

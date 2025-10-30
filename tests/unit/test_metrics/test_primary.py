@@ -1,4 +1,3 @@
-
 from liftlens.metrics.primary import conversion_rate, mean_diff, ratio_metric
 
 
@@ -21,5 +20,3 @@ def test_ratio_metric(sample_data):
     df["users"] = 1
     ratio = ratio_metric(df, "group", "revenue", "users")
     assert 7.5 < ratio < 8.5
-
-

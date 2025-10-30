@@ -1,4 +1,3 @@
-
 from collections.abc import Callable
 from functools import partial, reduce
 from typing import Any
@@ -8,8 +7,10 @@ import numpy as np
 
 def compose(*functions: Callable[..., Any]) -> Callable[..., Any]:
     """Compose functions: f(g(h(x)))"""
+
     def compose_two(f: Callable[..., Any], g: Callable[..., Any]) -> Callable[..., Any]:
         return lambda x: f(g(x))
+
     return reduce(compose_two, functions, lambda x: x)
 
 
@@ -32,5 +33,3 @@ def safe_mean(arr: np.ndarray) -> float:
     if len(arr) == 0:
         return np.nan
     return float(arr.mean())
-
-

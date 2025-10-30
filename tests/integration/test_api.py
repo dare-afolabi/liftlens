@@ -1,4 +1,3 @@
-
 from fastapi.testclient import TestClient
 
 from liftlens.api.server import app
@@ -19,7 +18,7 @@ def test_run_experiment(tmp_path, sample_data_path):
         "baseline_col": "baseline",
         "outcome_col": "outcome",
         "group_col": "group",
-        "metrics": [{"name": "mean", "type": "primary", "func": "mean_diff"}]
+        "metrics": [{"name": "mean", "type": "primary", "func": "mean_diff"}],
     }
 
     response = client.post("/run", json=config)
@@ -28,10 +27,9 @@ def test_run_experiment(tmp_path, sample_data_path):
 
     # Wait for async completion
     import time
+
     time.sleep(3)
 
     result = client.get(f"/results/{run_id}")
     assert result.status_code == 200
     assert "results_json" in result.json()
-
-

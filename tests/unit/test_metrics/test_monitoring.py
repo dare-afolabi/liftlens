@@ -1,4 +1,3 @@
-
 from liftlens.metrics.monitoring import ks_test, psi
 
 
@@ -10,8 +9,6 @@ def test_psi(sample_data):
 def test_ks_test(sample_data):
     result = ks_test(
         sample_data[sample_data["group"] == "control"]["outcome"],
-        sample_data[sample_data["group"] == "treatment"]["outcome"]
+        sample_data[sample_data["group"] == "treatment"]["outcome"],
     )
     assert result["p_value"] < 0.05  # distributions differ
-
-

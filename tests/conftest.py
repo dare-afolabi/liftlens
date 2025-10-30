@@ -1,4 +1,3 @@
-
 import os
 from pathlib import Path
 
@@ -26,12 +25,14 @@ def sample_data() -> pd.DataFrame:
     n = 1000
     control = np.random.normal(100, 15, n // 2)
     treatment = np.random.normal(108, 15, n // 2)  # 8% lift
-    df = pd.DataFrame({
-        "user_id": [f"user_{i}" for i in range(n)],
-        "group": ["control"] * (n // 2) + ["treatment"] * (n // 2),
-        "baseline": np.concatenate([control, control]),
-        "outcome": np.concatenate([control, treatment])
-    })
+    df = pd.DataFrame(
+        {
+            "user_id": [f"user_{i}" for i in range(n)],
+            "group": ["control"] * (n // 2) + ["treatment"] * (n // 2),
+            "baseline": np.concatenate([control, control]),
+            "outcome": np.concatenate([control, treatment]),
+        }
+    )
     return df
 
 
@@ -51,7 +52,7 @@ def config_dict():
         "baseline_col": "baseline",
         "outcome_col": "outcome",
         "group_col": "group",
-        "metrics": [{"name": "mean", "type": "primary", "func": "mean_diff"}]
+        "metrics": [{"name": "mean", "type": "primary", "func": "mean_diff"}],
     }
 
 
@@ -68,5 +69,3 @@ def postgres_url():
     if not url:
         pytest.skip("Postgres not configured - skipping postgres integration tests")
     return url
-
-

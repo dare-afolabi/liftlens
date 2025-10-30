@@ -1,4 +1,3 @@
-
 from liftlens.data.transform import apply_cuped, winsorize
 
 
@@ -15,5 +14,3 @@ def test_apply_cuped(sample_data):
     var_orig = sample_data["outcome"].var()
     var_cuped = df["outcome_cuped"].var()
     assert var_cuped < var_orig
-
-

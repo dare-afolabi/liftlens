@@ -1,4 +1,3 @@
-
 from liftlens.stats.inference import bootstrap_ci, welch_ttest
 
 
@@ -12,5 +11,3 @@ def test_bootstrap_ci(sample_data):
     result = bootstrap_ci(sample_data, "outcome")
     assert result["ci_95"][0] > 5.0
     assert result["significant"]
-
-

@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -53,9 +52,11 @@ class SequentialTest:
             "boundary": boundary,
             "crossed": crossed,
             "stopped": self.stopped,
-            "decision": self.decision
+            "decision": self.decision,
         }
-        logger.info(f"Interim {result['look']}: Z={z_score:.3f}, boundary={boundary:.3f}, {'STOP' if crossed else 'continue'}")
+        logger.info(
+            f"Interim {result['look']}: Z={z_score:.3f}, boundary={boundary:.3f}, {'STOP' if crossed else 'continue'}"
+        )
         return result
 
     def _obf_boundary(self, t: float) -> float:
@@ -85,7 +86,7 @@ def bayesian_monitoring(
     treatment_conversions: int = 0,
     control_n: int = 1,
     treatment_n: int = 1,
-    threshold: float = 0.95
+    threshold: float = 0.95,
 ) -> dict[str, Any]:
     """
     Bayesian A/B testing: P(treatment > control) > threshold
@@ -107,9 +108,13 @@ def bayesian_monitoring(
         "treatment_rate": treatment_conversions / treatment_n,
         "prob_treatment_better": float(prob_superior),
         "stop_early": prob_superior > threshold or prob_superior < (1 - threshold),
-        "recommendation": "treatment" if prob_superior > threshold else "control" if prob_superior < (1 - threshold) else "continue"
+        "recommendation": "treatment"
+        if prob_superior > threshold
+        else "control"
+        if prob_superior < (1 - threshold)
+        else "continue",
     }
-    logger.info(f"Bayesian: P(treat>ctrl)={prob_superior:.3f}, {result['recommendation']}")
+    logger.info(
+        f"Bayesian: P(treat>ctrl)={prob_superior:.3f}, {result['recommendation']}"
+    )
     return result
-
-

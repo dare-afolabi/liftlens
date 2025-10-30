@@ -1,4 +1,3 @@
-
 import subprocess
 import sys
 
@@ -16,16 +15,23 @@ def test_cli_run(tmp_path, sample_data_path):
     }}
     """)
 
-    result = subprocess.run([  # noqa: S603
-        sys.executable, "-m", "liftlens.cli", "run",
-        "--config", str(config),
-        "--output", str(tmp_path)
-    ], capture_output=True, text=True)
+    result = subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-m",
+            "liftlens.cli",
+            "run",
+            "--config",
+            str(config),
+            "--output",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+    )
 
     assert result.returncode == 0
     assert "Pipeline complete" in result.stdout
 
     report = list(tmp_path.rglob("report.html"))[0]
     assert report.exists()
-
-

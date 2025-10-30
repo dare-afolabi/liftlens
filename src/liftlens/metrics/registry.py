@@ -1,4 +1,3 @@
-
 from collections.abc import Callable
 from functools import partial
 from typing import Any
@@ -16,7 +15,9 @@ class MetricRegistry:
         self._metrics: dict[str, Callable[..., Any]] = {}
         self._aliases: dict[str, str] = {}
 
-    def register(self, name: str, func: Callable[..., Any], *, alias: str | None = None) -> None:
+    def register(
+        self, name: str, func: Callable[..., Any], *, alias: str | None = None
+    ) -> None:
         """
         Register a metric function.
 
@@ -30,7 +31,9 @@ class MetricRegistry:
         self._metrics[name] = func
         if alias:
             self._aliases[alias] = name
-        logger.debug(f"Registered metric: {name}" + (f" (alias: {alias})" if alias else ""))
+        logger.debug(
+            f"Registered metric: {name}" + (f" (alias: {alias})" if alias else "")
+        )
 
     def get(self, name: str) -> Callable[..., Any]:
         """Retrieve metric function by name or alias."""
@@ -39,9 +42,13 @@ class MetricRegistry:
         elif name in self._aliases:
             return self._metrics[self._aliases[name]]
         else:
-            raise KeyError(f"Metric '{name}' not found. Available: {list(self._metrics.keys())}")
+            raise KeyError(
+                f"Metric '{name}' not found. Available: {list(self._metrics.keys())}"
+            )
 
-    def call(self, name: str, df: Any, group_col: str, metric_col: str, **params: Any) -> float:
+    def call(
+        self, name: str, df: Any, group_col: str, metric_col: str, **params: Any
+    ) -> float:
         """Execute metric with parameters."""
         func = self.get(name)
         if params:
@@ -52,8 +59,12 @@ class MetricRegistry:
 
     def list_metrics(self) -> dict[str, str]:
         """Return mapping of name → docstring."""
-        return {name: func.__doc__.strip().split('\n')[0] if func.__doc__ else "No description"
-                for name, func in self._metrics.items()}
+        return {
+            name: func.__doc__.strip().split("\n")[0]
+            if func.__doc__
+            else "No description"
+            for name, func in self._metrics.items()
+        }
 
     def __contains__(self, name: str) -> bool:
         return name in self._metrics or name in self._aliases
@@ -61,5 +72,3 @@ class MetricRegistry:
 
 # Global registry instance
 registry = MetricRegistry()
-
-

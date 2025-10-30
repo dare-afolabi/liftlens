@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import pytest
@@ -15,6 +14,7 @@ def test_pipeline_postgres(tmp_path: Path, sample_data_path: Path, postgres_url:
     # 1. Insert CSV data into PostgreSQL for test
     import pandas as pd
     from sqlalchemy import create_engine
+
     df = pd.read_csv(sample_data_path)
     engine = create_engine(postgres_url)
     df.to_sql("ab_test_data", engine, if_exists="replace", index=False)
@@ -25,7 +25,7 @@ def test_pipeline_postgres(tmp_path: Path, sample_data_path: Path, postgres_url:
         baseline_col="baseline",
         outcome_col="outcome",
         group_col="group",
-        metrics=[MetricSpec(name="mean_lift", type="primary", func="mean_diff")]
+        metrics=[MetricSpec(name="mean_lift", type="primary", func="mean_diff")],
     )
 
     config_path = tmp_path / "config.json"
@@ -43,8 +43,7 @@ def test_pipeline_postgres(tmp_path: Path, sample_data_path: Path, postgres_url:
 
     # Validate registry
     from liftlens.core.registry import registry
+
     runs = registry.list_runs(name="postgres_test")
     assert len(runs) == 1
     assert runs[0]["status"] == "completed"
-
-

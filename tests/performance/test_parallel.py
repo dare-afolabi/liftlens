@@ -1,4 +1,3 @@
-
 import pytest
 
 from liftlens.engine.parallel import parallel_apply
@@ -6,8 +5,9 @@ from liftlens.engine.parallel import parallel_apply
 
 def slow_function(x):
     import time
+
     time.sleep(0.01)
-    return x ** 2
+    return x**2
 
 
 def test_parallel_joblib():
@@ -30,5 +30,3 @@ def test_parallel_ray():
         assert len(results) == 50
     except ImportError:
         pytest.skip("ray not installed")
-
-

@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -10,9 +9,7 @@ from ..metrics.registry import registry as metric_registry
 
 
 def welch_ttest(
-    df: pd.DataFrame,
-    metric_col: str,
-    group_col: str = "group"
+    df: pd.DataFrame, metric_col: str, group_col: str = "group"
 ) -> dict[str, Any]:
     """
     Welch's t-test for unequal variances.
@@ -25,14 +22,16 @@ def welch_ttest(
         logger.warning("Insufficient sample size for t-test")
         return {"error": "n < 2 in one group"}
 
-    t_stat, p_value = stats.ttest_ind(treatment, control, equal_var=False, nan_policy='omit')
+    t_stat, p_value = stats.ttest_ind(
+        treatment, control, equal_var=False, nan_policy="omit"
+    )
     mean_diff = treatment.mean() - control.mean()
 
     # Degrees of freedom (Welch-Satterthwaite)
     se_control = control.std() / np.sqrt(len(control))
     se_treatment = treatment.std() / np.sqrt(len(treatment))
     se_diff = np.sqrt(se_control**2 + se_treatment**2)
-    df_welch = (se_control**2 + se_treatment**2)**2 / (
+    df_welch = (se_control**2 + se_treatment**2) ** 2 / (
         (se_control**4 / (len(control) - 1)) + (se_treatment**4 / (len(treatment) - 1))
     )
 
@@ -51,7 +50,7 @@ def welch_ttest(
         "ci_95": [float(ci[0]), float(ci[1])],
         "significant": p_value < 0.05,
         "n_control": len(control),
-        "n_treatment": len(treatment)
+        "n_treatment": len(treatment),
     }
     logger.info(f"Welch t-test: t={t_stat:.3f}, p={p_value:.3f}, diff={mean_diff:.3f}")
     return result
@@ -62,7 +61,7 @@ def bootstrap_ci(
     metric_col: str,
     group_col: str = "group",
     n_boot: int = 10_000,
-    alpha: float = 0.05
+    alpha: float = 0.05,
 ) -> dict[str, Any]:
     """
     Percentile bootstrap confidence interval for mean difference.
@@ -76,25 +75,24 @@ def bootstrap_ci(
         return float(t_sample.mean() - c_sample.mean())
 
     boot_diffs = np.array([boot_diff() for _ in range(n_boot)])
-    ci_lower = np.percentile(boot_diffs, (alpha/2)*100)
-    ci_upper = np.percentile(boot_diffs, (1 - alpha/2)*100)
+    ci_lower = np.percentile(boot_diffs, (alpha / 2) * 100)
+    ci_upper = np.percentile(boot_diffs, (1 - alpha / 2) * 100)
 
     result = {
         "method": "bootstrap",
         "mean_diff": float(treatment.mean() - control.mean()),
         "ci_95": [float(ci_lower), float(ci_upper)],
         "n_boot": n_boot,
-        "significant": (ci_lower > 0) or (ci_upper < 0)
+        "significant": (ci_lower > 0) or (ci_upper < 0),
     }
-    logger.info(f"Bootstrap: diff={result['mean_diff']:.3f}, CI=[{ci_lower:.3f}, {ci_upper:.3f}]")
+    logger.info(
+        f"Bootstrap: diff={result['mean_diff']:.3f}, CI=[{ci_lower:.3f}, {ci_upper:.3f}]"
+    )
     return result
 
 
 def permutation_test(
-    df: pd.DataFrame,
-    metric_col: str,
-    group_col: str = "group",
-    n_perm: int = 5_000
+    df: pd.DataFrame, metric_col: str, group_col: str = "group", n_perm: int = 5_000
 ) -> dict[str, Any]:
     """
     Permutation test for difference in means.
@@ -118,9 +116,7 @@ def permutation_test(
         "observed_diff": float(observed),
         "p_value": float(p_value),
         "n_perm": n_perm,
-        "significant": p_value < 0.05
+        "significant": p_value < 0.05,
     }
     logger.info(f"Permutation test: obs={observed:.3f}, p={p_value:.3f}")
     return result
-
-

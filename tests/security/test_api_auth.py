@@ -1,4 +1,3 @@
-
 from fastapi.testclient import TestClient
 
 from liftlens.api.server import app
@@ -18,10 +17,9 @@ def test_valid_api_key(monkeypatch):
     import importlib
 
     import liftlens.config.settings
+
     importlib.reload(liftlens.config.settings)
 
     headers = {"X-API-Key": "test-secret"}
     response = client.post("/run", json={}, headers=headers)
     assert response.status_code == 422  # missing body, but auth passed
-
-

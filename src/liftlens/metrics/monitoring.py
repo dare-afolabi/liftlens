@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -15,8 +14,8 @@ def psi(expected: pd.Series, actual: pd.Series, buckets: int = 10) -> float:
     # Create bins based on the expected distribution percentiles and apply to both series
     percentiles = np.linspace(0, 100, buckets + 1)
     bins = np.percentile(expected, percentiles)
-    exp_bins = pd.cut(expected, bins, include_lowest=True, duplicates='drop')
-    act_bins = pd.cut(actual, bins, include_lowest=True, duplicates='drop')
+    exp_bins = pd.cut(expected, bins, include_lowest=True, duplicates="drop")
+    act_bins = pd.cut(actual, bins, include_lowest=True, duplicates="drop")
 
     exp_pct = pd.Series(exp_bins).value_counts(normalize=True, sort=False)
     act_pct = pd.Series(act_bins).value_counts(normalize=True, sort=False)
@@ -37,7 +36,7 @@ def ks_test(control: pd.Series, treatment: pd.Series) -> dict[str, Any]:
     result = {
         "ks_statistic": float(ks_stat),
         "p_value": float(p_value),
-        "significant": p_value < 0.05
+        "significant": p_value < 0.05,
     }
     logger.debug(f"KS test: stat={ks_stat:.3f}, p={p_value:.3f}")
     return result
@@ -60,7 +59,5 @@ def cvm_test(control: pd.Series, treatment: pd.Series) -> dict[str, Any]:
     return {
         "cvm_statistic": float(result.statistic),
         "p_value": float(result.pvalue),
-        "significant": result.pvalue < 0.05
+        "significant": result.pvalue < 0.05,
     }
-
-

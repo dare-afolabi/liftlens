@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -19,7 +18,7 @@ def test_full_pipeline_csv(tmp_path: Path, sample_data_path: Path):
         baseline_col="baseline",
         outcome_col="outcome",
         group_col="group",
-        metrics=[MetricSpec(name="mean_lift", type="primary", func="mean_diff")]
+        metrics=[MetricSpec(name="mean_lift", type="primary", func="mean_diff")],
     )
 
     config_path = tmp_path / "config.json"
@@ -40,10 +39,9 @@ def test_full_pipeline_csv(tmp_path: Path, sample_data_path: Path):
 
     # Validate registry entry
     from liftlens.core.registry import registry
+
     runs = registry.list_runs(name="csv_full_test")
     assert len(runs) == 1
     assert runs[0]["status"] == "completed"
     results = json.loads(runs[0]["results_json"])
     assert "mean_lift" in results["metrics"][0]["name"]
-
-

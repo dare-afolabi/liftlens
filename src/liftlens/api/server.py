@@ -1,4 +1,3 @@
-
 import os
 from collections.abc import Callable
 from pathlib import Path
@@ -14,12 +13,14 @@ from ..workflows.pipeline import run_pipeline
 app = FastAPI(
     title="A/B Test Framework API",
     description="An Enterprise-grade A/B Testing with FastAPI",
-    version="0.1.0"
+    version="0.1.0",
 )
 
 
 @app.middleware("http")
-async def require_api_key_middleware(request: Request, call_next: Callable[[Request], Any]) -> Any:
+async def require_api_key_middleware(
+    request: Request, call_next: Callable[[Request], Any]
+) -> Any:
     # Only enforce API key on the /run endpoint (submit experiment)
     if request.url.path == "/run":
         expected = os.getenv("LIFTLENS_API_KEY")
@@ -28,7 +29,10 @@ async def require_api_key_middleware(request: Request, call_next: Callable[[Requ
         if expected is not None:
             if key != expected:
                 from fastapi.responses import JSONResponse
-                return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
+
+                return JSONResponse(
+                    status_code=401, content={"detail": "Invalid API Key"}
+                )
         else:
             # No API key configured: allow requests only when the request
             # body looks like a valid ExperimentConfig (helps keep tests
@@ -36,14 +40,26 @@ async def require_api_key_middleware(request: Request, call_next: Callable[[Requ
             # obviously incorrect payloads with 401 to satisfy security
             # tests that expect unauthorized access.
             from fastapi.responses import JSONResponse
+
             try:
                 body = await request.json()
             except (ValueError, TypeError):
                 # Malformed JSON or unexpected type: treat as unauthorized
-                return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
-            required = {"name", "data", "baseline_col", "outcome_col", "group_col", "metrics"}
+                return JSONResponse(
+                    status_code=401, content={"detail": "Invalid API Key"}
+                )
+            required = {
+                "name",
+                "data",
+                "baseline_col",
+                "outcome_col",
+                "group_col",
+                "metrics",
+            }
             if not (isinstance(body, dict) and required.issubset(body.keys())):
-                return JSONResponse(status_code=401, content={"detail": "Invalid API Key"})
+                return JSONResponse(
+                    status_code=401, content={"detail": "Invalid API Key"}
+                )
     return await call_next(request)
 
 
@@ -76,5 +92,3 @@ async def get_report(run_id: str) -> FileResponse:
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "healthy"}
-
-

@@ -1,4 +1,3 @@
-
 """Configuration module."""
 
 from .schemas import (
@@ -11,8 +10,10 @@ from .schemas import (
 )
 
 __all__ = [
-    "ExperimentConfig", "DataSource", "MetricSpec",
-    "TransformConfig", "StatsConfig", "ReportConfig"
+    "ExperimentConfig",
+    "DataSource",
+    "MetricSpec",
+    "TransformConfig",
+    "StatsConfig",
+    "ReportConfig",
 ]
-
-

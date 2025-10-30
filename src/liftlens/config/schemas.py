@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import Any, Literal
 
@@ -13,6 +12,7 @@ class LiftlensBaseModel(BaseModel):
     thin wrapper that forwards to ``model_dump_json`` so existing callers keep
     working without changing tests.
     """
+
     def json(self, *args: object, indent: int | None = None, **kwargs: object) -> str:
         return self.model_dump_json(indent=indent)
 
@@ -82,5 +82,3 @@ class ExperimentConfig(LiftlensBaseModel):
         if not v:
             raise ValueError("At least one metric required")
         return v
-
-

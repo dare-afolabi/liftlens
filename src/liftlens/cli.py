@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import typer
@@ -10,7 +9,7 @@ from .workflows.pipeline import run_pipeline
 app = typer.Typer(
     name="liftlens",
     help="An Enterprise-grade A/B Testing Framework CLI",
-    add_completion=False
+    add_completion=False,
 )
 
 
@@ -43,6 +42,7 @@ def run(
 def serve() -> None:
     """Start the FastAPI server."""
     import uvicorn
+
     logger.info("Starting FastAPI server on http://0.0.0.0:8000")
     # Intentionally bind to all interfaces for local development/CLI usage.
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8000, log_level="info")  # noqa: S104
@@ -53,11 +53,19 @@ def dashboard() -> None:
     """Launch the Streamlit dashboard."""
     import subprocess
     import sys
+
     logger.info("Launching Streamlit dashboard on http://0.0.0.0:8501")
-    subprocess.run([sys.executable, "-m", "streamlit", "run", "liftlens/api/dashboard.py", "--server.port=8501"])  # noqa: S603
+    subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            "liftlens/api/dashboard.py",
+            "--server.port=8501",
+        ]
+    )  # noqa: S603
 
 
 if __name__ == "__main__":
     app()
-
-

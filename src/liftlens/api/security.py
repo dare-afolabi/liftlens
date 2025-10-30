@@ -1,4 +1,3 @@
-
 import os
 
 from fastapi import Depends, HTTPException, status
@@ -14,9 +13,6 @@ async def verify_api_key(key: str = Depends(api_key_header)) -> str:
     # configured for API key auth).
     if expected is None or key != expected:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API Key"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API Key"
         )
     return key
-
-

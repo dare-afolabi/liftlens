@@ -1,5 +1,3 @@
-
-
 import pandas as pd
 from loguru import logger
 
@@ -9,7 +7,7 @@ def weighted_index(
     group_col: str,
     metric_col: str,
     weights: dict[str, float] | None = None,
-    submetrics: list[str] | None = None
+    submetrics: list[str] | None = None,
 ) -> float:
     """
     Composite index: weighted average of standardized sub-metrics.
@@ -44,10 +42,10 @@ def weighted_index(
     sub_df["index"] = sum(weights.get(col, 0) * sub_df[col] for col in weights)
 
     # Mean difference
-    diff = sub_df[sub_df[group_col] == "treatment"]["index"].mean() - \
-           sub_df[sub_df[group_col] == "control"]["index"].mean()
+    diff = (
+        sub_df[sub_df[group_col] == "treatment"]["index"].mean()
+        - sub_df[sub_df[group_col] == "control"]["index"].mean()
+    )
 
     logger.debug(f"Weighted index: {diff:.6f} (weights: {weights})")
     return float(diff)
-
-

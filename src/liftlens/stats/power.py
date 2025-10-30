@@ -1,5 +1,3 @@
-
-
 from collections.abc import Callable
 from typing import Any
 
@@ -15,7 +13,7 @@ def analytical_power(
     n_control: int,
     n_treatment: int | None = None,
     alpha: float = 0.05,
-    two_tailed: bool = True
+    two_tailed: bool = True,
 ) -> float:
     """
     Analytical power for two-sample t-test (equal variance assumption).
@@ -25,15 +23,14 @@ def analytical_power(
     ncp = effect_size * np.sqrt((n_control * n_treatment) / (n_control + n_treatment))
     crit = stats.t.ppf(1 - alpha / (1 if not two_tailed else 2), df)
     power = 1 - stats.nct.cdf(crit, df, ncp)
-    logger.debug(f"Analytical power: {power:.3f} (d={effect_size}, n1={n_control}, n2={n_treatment})")
+    logger.debug(
+        f"Analytical power: {power:.3f} (d={effect_size}, n1={n_control}, n2={n_treatment})"
+    )
     return float(power)
 
 
 def sample_size_for_power(
-    effect_size: float,
-    power: float = 0.8,
-    alpha: float = 0.05,
-    ratio: float = 1.0
+    effect_size: float, power: float = 0.8, alpha: float = 0.05, ratio: float = 1.0
 ) -> int:
     """
     Minimum sample size per group for desired power.
@@ -54,7 +51,7 @@ def simulation_power(
     effect_size: float,
     n_per_group: int,
     n_sim: int = 1000,
-    alpha: float = 0.05
+    alpha: float = 0.05,
 ) -> float:
     """Monte Carlo power estimation."""
     significant = 0
@@ -66,5 +63,3 @@ def simulation_power(
     power = significant / n_sim
     logger.info(f"Simulation power: {power:.3f} ({n_sim} sims, n={n_per_group})")
     return float(power)
-
-

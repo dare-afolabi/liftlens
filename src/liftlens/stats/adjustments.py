@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -17,9 +16,11 @@ def bonferroni(p_values: list[float], alpha: float = 0.05) -> dict[str, Any]:
         "alpha_original": alpha,
         "alpha_corrected": corrected_alpha,
         "p_values": p_values,
-        "significant": significant
+        "significant": significant,
     }
-    logger.info(f"Bonferroni: {sum(significant)}/{n} significant at α={corrected_alpha:.4f}")
+    logger.info(
+        f"Bonferroni: {sum(significant)}/{n} significant at α={corrected_alpha:.4f}"
+    )
     return result
 
 
@@ -45,7 +46,7 @@ def holm_bonferroni(p_values: list[float], alpha: float = 0.05) -> dict[str, Any
         "method": "Holm-Bonferroni",
         "n_tests": n,
         "p_values": p_values,
-        "significant": significant
+        "significant": significant,
     }
     logger.info(f"Holm: {sum(significant)}/{n} significant")
     return result
@@ -53,21 +54,18 @@ def holm_bonferroni(p_values: list[float], alpha: float = 0.05) -> dict[str, Any
 
 def benjamini_hochberg(p_values: list[float], fdr: float = 0.05) -> dict[str, Any]:
     """Benjamini-Hochberg for FDR control."""
-    reject, _, _, _ = multipletests(p_values, alpha=fdr, method='fdr_bh')
+    reject, _, _, _ = multipletests(p_values, alpha=fdr, method="fdr_bh")
     result = {
         "method": "Benjamini-Hochberg",
         "fdr": fdr,
         "p_values": p_values,
-        "significant": reject.tolist()
+        "significant": reject.tolist(),
     }
     logger.info(f"BH-FDR: {sum(reject)}/{len(p_values)} significant at FDR={fdr}")
     return result
 
 
-def closed_testing(
-    p_values: list[float],
-    alpha: float = 0.05
-) -> dict[str, Any]:
+def closed_testing(p_values: list[float], alpha: float = 0.05) -> dict[str, Any]:
     """Closed testing procedure (for strong FWER control)."""
     n = len(p_values)
     p_sorted_idx = np.argsort(p_values)
@@ -85,9 +83,7 @@ def closed_testing(
         "method": "Closed Testing",
         "n_tests": n,
         "p_values": p_values,
-        "significant": significant
+        "significant": significant,
     }
     logger.info(f"Closed testing: {sum(significant)}/{n} significant")
     return result
-
-

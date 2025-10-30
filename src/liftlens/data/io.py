@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import Literal, cast
 
@@ -24,7 +23,10 @@ def load_data(source: str | Path | DataSource) -> pd.DataFrame:
     """
     if isinstance(source, (str, Path)):
         src_type = _detect_type(str(source))
-        source = DataSource(type=cast(Literal["csv", "parquet", "db", "delta"], src_type), path=Path(source))
+        source = DataSource(
+            type=cast(Literal["csv", "parquet", "db", "delta"], src_type),
+            path=Path(source),
+        )
 
     if not isinstance(source, DataSource):
         raise TypeError("source must be str, Path, or DataSource")
@@ -44,6 +46,7 @@ def load_data(source: str | Path | DataSource) -> pd.DataFrame:
             df = pd.read_sql_table(source.table, engine)
     elif source.type == "delta":
         import deltalake as dl
+
         df = dl.read(source.path).to_pandas()
     else:
         raise ValueError(f"Unsupported data source type: {source.type}")
@@ -72,13 +75,13 @@ def save_data(df: pd.DataFrame, path: str | Path, format: str | None = None) -> 
 
 def _detect_type(path_str: str) -> str:
     """Detect file type from extension."""
-    if path_str.endswith(('.csv', '.csv.gz')):
+    if path_str.endswith((".csv", ".csv.gz")):
         return "csv"
-    elif path_str.endswith('.parquet'):
+    elif path_str.endswith(".parquet"):
         return "parquet"
-    elif path_str.startswith(('postgresql://', 'sqlite://', 'mysql://')):
+    elif path_str.startswith(("postgresql://", "sqlite://", "mysql://")):
         return "db"
-    elif path_str.endswith('/'):  # directory → assume Delta
+    elif path_str.endswith("/"):  # directory → assume Delta
         return "delta"
     else:
         raise ValueError(f"Cannot detect type from path: {path_str}")
@@ -86,9 +89,9 @@ def _detect_type(path_str: str) -> str:
 
 def _detect_format(path: Path) -> str:
     """Detect output format from file extension."""
-    if path.suffix in {'.csv', '.gz'}:
+    if path.suffix in {".csv", ".gz"}:
         return "csv"
-    elif path.suffix == '.parquet':
+    elif path.suffix == ".parquet":
         return "parquet"
     else:
         return "parquet"  # default
@@ -97,8 +100,7 @@ def _detect_format(path: Path) -> str:
 def _get_db_url() -> str:
     """Get database URL from environment or config."""
     from ..config.settings import settings
+
     if settings.db_url:
         return settings.db_url
     raise ValueError("DB_URL not configured. Set LIFTLENS_DB_URL environment variable.")
-
-

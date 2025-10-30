@@ -1,4 +1,3 @@
-
 import os
 import random
 import tempfile
@@ -28,7 +27,9 @@ class Session:
     @contextmanager
     def temp_path(self, suffix: str = "") -> Generator[Path, None, None]:
         """Yield a temporary file path that is automatically cleaned up."""
-        with tempfile.NamedTemporaryFile(dir=self.temp_dir, suffix=suffix, delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            dir=self.temp_dir, suffix=suffix, delete=False
+        ) as f:
             path = Path(f.name)
         try:
             yield path
@@ -39,6 +40,7 @@ class Session:
     def cleanup(self) -> None:
         """Remove all temporary files."""
         import shutil
+
         if self.temp_dir.exists():
             shutil.rmtree(self.temp_dir, ignore_errors=True)
             logger.debug(f"Cleaned up temp directory: {self.temp_dir}")
@@ -46,5 +48,3 @@ class Session:
 
 # Global session instance
 session = Session()
-
-

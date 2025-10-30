@@ -1,4 +1,3 @@
-
 from liftlens.viz.distributions import histogram
 
 
@@ -7,5 +6,3 @@ def test_histogram(sample_data):
     assert isinstance(plot_data, dict)
     assert "data" in plot_data
     assert len(plot_data["data"]) == 2  # control + treatment
-
-

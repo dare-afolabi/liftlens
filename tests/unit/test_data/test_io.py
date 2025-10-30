@@ -1,4 +1,3 @@
-
 import pandas as pd
 import pytest
 
@@ -32,5 +31,3 @@ def test_save_csv(tmp_path, sample_data):
     assert path.exists()
     df = pd.read_csv(path)
     assert len(df) == 1000
-
-

@@ -1,4 +1,3 @@
-
 from typing import Any, cast
 
 from loguru import logger
@@ -9,7 +8,10 @@ def render_markdown(md_content: str) -> str:
     """Convert Markdown to HTML."""
     try:
         import markdown  # type: ignore
-        return cast(str, markdown.markdown(md_content, extensions=['tables', 'fenced_code']))
+
+        return cast(
+            str, markdown.markdown(md_content, extensions=["tables", "fenced_code"])
+        )
     except ImportError:
         logger.error("markdown package required")
         return md_content
@@ -28,6 +30,5 @@ def render_pdf(html_content: str, css_path: str | None = None) -> bytes:
 def render_json(data: dict[str, Any]) -> str:
     """Serialize full report to JSON."""
     import json
+
     return json.dumps(data, indent=2, default=str)
-
-

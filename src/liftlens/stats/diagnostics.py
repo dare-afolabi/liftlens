@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -23,14 +22,16 @@ def normality_test(series: pd.Series, method: str = "shapiro") -> dict[str, Any]
     result = {
         "method": method,
         "statistic": float(stat),
-        "p_value": float(p) if 'p' in locals() else None,
-        "normal": p > 0.05 if 'p' in locals() else stat < result.critical_values[2]
+        "p_value": float(p) if "p" in locals() else None,
+        "normal": p > 0.05 if "p" in locals() else stat < result.critical_values[2],
     }
     logger.debug(f"Normality ({method}): stat={stat:.3f}, p={p:.3f}")
     return result
 
 
-def variance_test(df: pd.DataFrame, metric_col: str, group_col: str = "group") -> dict[str, Any]:
+def variance_test(
+    df: pd.DataFrame, metric_col: str, group_col: str = "group"
+) -> dict[str, Any]:
     """Levene's test for equality of variances."""
     control = df[df[group_col] == "control"][metric_col]
     treatment = df[df[group_col] == "treatment"][metric_col]
@@ -39,7 +40,7 @@ def variance_test(df: pd.DataFrame, metric_col: str, group_col: str = "group") -
         "method": "Levene",
         "statistic": float(stat),
         "p_value": float(p),
-        "equal_variance": p > 0.05
+        "equal_variance": p > 0.05,
     }
     logger.debug(f"Levene: stat={stat:.3f}, p={p:.3f}")
     return result
@@ -52,17 +53,11 @@ def qq_plot_data(series: pd.Series, n_points: int = 100) -> dict[str, Any]:
     probs = np.linspace(0.01, 0.99, n_points)
     theoretical = stats.norm.ppf(probs)
     sample = np.percentile(series, probs * 100)
-    return {
-        "theoretical": theoretical.tolist(),
-        "sample": sample.tolist()
-    }
+    return {"theoretical": theoretical.tolist(), "sample": sample.tolist()}
 
 
 def parallel_trends_test(
-    df_pre: pd.DataFrame,
-    df_post: pd.DataFrame,
-    group_col: str,
-    metric_col: str
+    df_pre: pd.DataFrame, df_post: pd.DataFrame, group_col: str, metric_col: str
 ) -> dict[str, Any]:
     """Test for parallel trends assumption in DiD."""
     # Simple slope comparison
@@ -79,9 +74,9 @@ def parallel_trends_test(
         "slope_control": float(slope_control),
         "slope_treatment": float(slope_treatment),
         "diff_in_slopes": float(diff_in_slopes),
-        "parallel": abs(diff_in_slopes) < 0.01 * pre_control.mean()
+        "parallel": abs(diff_in_slopes) < 0.01 * pre_control.mean(),
     }
-    logger.info(f"Parallel trends: Δcontrol={slope_control:.3f}, Δtreatment={slope_treatment:.3f}")
+    logger.info(
+        f"Parallel trends: Δcontrol={slope_control:.3f}, Δtreatment={slope_treatment:.3f}"
+    )
     return result
-
-

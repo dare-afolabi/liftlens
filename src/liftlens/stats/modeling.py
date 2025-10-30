@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import pandas as pd
@@ -8,10 +7,7 @@ from numpy.linalg import LinAlgError
 
 
 def ancova(
-    df: pd.DataFrame,
-    outcome_col: str,
-    baseline_col: str,
-    group_col: str = "group"
+    df: pd.DataFrame, outcome_col: str, baseline_col: str, group_col: str = "group"
 ) -> dict[str, Any]:
     """
     Analysis of Covariance (ANCOVA) with baseline as covariate.
@@ -34,17 +30,14 @@ def ancova(
         "p_value": float(p_value),
         "ci_95": [float(ci[0]), float(ci[1])],
         "r_squared": float(model.rsquared),
-        "significant": p_value < 0.05
+        "significant": p_value < 0.05,
     }
     logger.info(f"ANCOVA: β={coef:.4f}, p={p_value:.3f}, R²={model.rsquared:.3f}")
     return result
 
 
 def ols_regression(
-    df: pd.DataFrame,
-    outcome_col: str,
-    predictors: list[str],
-    group_col: str = "group"
+    df: pd.DataFrame, outcome_col: str, predictors: list[str], group_col: str = "group"
 ) -> dict[str, Any]:
     """
     General OLS with treatment and covariates.
@@ -62,9 +55,11 @@ def ols_regression(
         "p_values": {k: float(v) for k, v in model.pvalues.items()},
         "r_squared": float(model.rsquared),
         "adj_r_squared": float(model.rsquared_adj),
-        "summary": model.summary().as_text()
+        "summary": model.summary().as_text(),
     }
-    logger.info(f"OLS: R²={model.rsquared:.3f}, treatment p={model.pvalues['treatment']:.3f}")
+    logger.info(
+        f"OLS: R²={model.rsquared:.3f}, treatment p={model.pvalues['treatment']:.3f}"
+    )
     return result
 
 
@@ -73,7 +68,7 @@ def mixed_effects(
     outcome_col: str,
     fixed_effects: list[str],
     random_effect: str,
-    group_col: str = "group"
+    group_col: str = "group",
 ) -> dict[str, Any]:
     """
     Linear Mixed-Effects Model (LMM) with random intercept.
@@ -98,9 +93,11 @@ def mixed_effects(
 
     result = {
         "method": "Mixed-Effects",
-        "fixed_effects": {k: float(v) for k, v in model.params.items() if not k.startswith("Group")},
+        "fixed_effects": {
+            k: float(v) for k, v in model.params.items() if not k.startswith("Group")
+        },
         "random_var": float(model.cov_re.iloc[0, 0]),
-        "significant": model.pvalues["treatment"] < 0.05
+        "significant": model.pvalues["treatment"] < 0.05,
     }
     logger.info(f"LMM: treatment p={model.pvalues['treatment']:.3f}")
     return result
@@ -110,7 +107,7 @@ def gam_model(
     df: pd.DataFrame,
     outcome_col: str,
     smooth_terms: list[str],
-    group_col: str = "group"
+    group_col: str = "group",
 ) -> dict[str, Any]:
     """
     Generalized Additive Model (GAM) with smooth splines.
@@ -134,9 +131,9 @@ def gam_model(
     result = {
         "method": "GAM",
         "treatment_effect": float(treatment_effect),
-        "partial_dependencies": [gam.partial_dependence(term=i) for i in range(len(smooth_terms))]
+        "partial_dependencies": [
+            gam.partial_dependence(term=i) for i in range(len(smooth_terms))
+        ],
     }
     logger.info(f"GAM: treatment effect = {treatment_effect:.4f}")
     return result
-
-

@@ -1,4 +1,3 @@
-
 from typing import Any
 
 import numpy as np
@@ -18,12 +17,19 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
-    schema: Any = DataFrameSchema({  # type: ignore[no-untyped-call]
-        "user_id": Column(str, Check(lambda s: s.nunique() == len(s)), nullable=False),
-        "baseline": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
-        "outcome": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
-        "group": Column(str, Check(lambda s: set(s.unique()).issubset({"control", "treatment"}))),
-    }, strict=True)
+    schema: Any = DataFrameSchema(
+        {  # type: ignore[no-untyped-call]
+            "user_id": Column(
+                str, Check(lambda s: s.nunique() == len(s)), nullable=False
+            ),
+            "baseline": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
+            "outcome": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
+            "group": Column(
+                str, Check(lambda s: set(s.unique()).issubset({"control", "treatment"}))
+            ),
+        },
+        strict=True,
+    )
 
     try:
         schema.validate(df, lazy=True)
@@ -33,7 +39,9 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
         raise
 
 
-def check_srm(df: pd.DataFrame, group_col: str = "group", alpha: float = 0.01) -> dict[str, Any]:
+def check_srm(
+    df: pd.DataFrame, group_col: str = "group", alpha: float = 0.01
+) -> dict[str, Any]:
     """
     Sample Ratio Mismatch (SRM) detection using chi-squared test.
 
@@ -54,7 +62,7 @@ def check_srm(df: pd.DataFrame, group_col: str = "group", alpha: float = 0.01) -
         "observed": observed.to_dict(),
         "expected": expected.to_dict(),
         "is_srm": is_srm,
-        "warning": "SRM Detected" if is_srm else None
+        "warning": "SRM Detected" if is_srm else None,
     }
 
     if is_srm:
@@ -66,10 +74,7 @@ def check_srm(df: pd.DataFrame, group_col: str = "group", alpha: float = 0.01) -
 
 
 def check_balance(
-    df: pd.DataFrame,
-    baseline_col: str,
-    group_col: str = "group",
-    alpha: float = 0.05
+    df: pd.DataFrame, baseline_col: str, group_col: str = "group", alpha: float = 0.05
 ) -> dict[str, Any]:
     """
     Covariate balance check using standardized mean difference (SMD) and t-test.
@@ -84,7 +89,7 @@ def check_balance(
         "smd": float(smd),
         "smd_interpretation": _interpret_smd(abs(smd)),
         "t_test_p_value": float(p_value),
-        "is_imbalanced": abs(smd) > 0.1 or p_value < alpha
+        "is_imbalanced": abs(smd) > 0.1 or p_value < alpha,
     }
 
     if result["is_imbalanced"]:
@@ -111,5 +116,3 @@ def _interpret_smd(smd: float) -> str:
         return "medium"
     else:
         return "large"
-
-

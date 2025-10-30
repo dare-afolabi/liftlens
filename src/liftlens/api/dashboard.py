@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 import pandas as pd
@@ -16,7 +15,11 @@ if not runs:
     st.info("No experiments yet. Run via CLI or API.")
     st.stop()
 
-selected = st.selectbox("Select Experiment", options=runs, format_func=lambda r: f"{r['name']} ({r['run_id']})")
+selected = st.selectbox(
+    "Select Experiment",
+    options=runs,
+    format_func=lambda r: f"{r['name']} ({r['run_id']})",
+)
 run = registry.get_run(selected["run_id"])
 if run is None:
     st.error("Selected run not found")
@@ -28,7 +31,12 @@ with col1:
     st.metric("Status", run["status"].title())
     st.metric("Start Time", run["start_time"][:19])
 with col2:
-    st.metric("Duration", f"{(pd.Timestamp(run['end_time']) - pd.Timestamp(run['start_time'])).seconds}s" if run["end_time"] else "Running")
+    st.metric(
+        "Duration",
+        f"{(pd.Timestamp(run['end_time']) - pd.Timestamp(run['start_time'])).seconds}s"
+        if run["end_time"]
+        else "Running",
+    )
 
 # Results
 if run.get("results_json"):
@@ -40,5 +48,3 @@ if run.get("results_json"):
 report_path = Path("output") / run["run_id"] / "report.html"
 if report_path.exists():
     st.components.v1.html(report_path.read_text(), height=800, scrolling=True)
-
-

@@ -1,8 +1,8 @@
-
 #!/usr/bin/env python3
 """
 Enhanced synthetic data generator with heterogeneity, CUPED, and strata.
 """
+
 import argparse
 from pathlib import Path
 
@@ -17,7 +17,7 @@ def generate_data(
     heterogeneity: bool = True,
     strata_col: str = "country",
     noise_level: float = 10.0,
-    seed: int = 42
+    seed: int = 42,
 ) -> pd.DataFrame:
     np.random.seed(seed)
     logger.info(f"Generating {n_users:,} users with effect={effect_size}")
@@ -34,7 +34,7 @@ def generate_data(
     df["group"] = "control"
     for s in df["stratum"].unique():
         idx = df[df["stratum"] == s].index
-        treat_idx = np.random.choice(idx, size=len(idx)//2, replace=False)
+        treat_idx = np.random.choice(idx, size=len(idx) // 2, replace=False)
         df.loc[treat_idx, "group"] = "treatment"
 
     # Heterogeneity in treatment effect
@@ -47,26 +47,38 @@ def generate_data(
 
     # Outcome with noise
     noise = np.random.normal(0, noise_level, n_users)
-    df["outcome"] = df["baseline"] * (1 + df["group"].map({"control": 0, "treatment": 1}) * df["effect"]) + noise
+    df["outcome"] = (
+        df["baseline"]
+        * (1 + df["group"].map({"control": 0, "treatment": 1}) * df["effect"])
+        + noise
+    )
     df["outcome"] = df["outcome"].clip(lower=0)
 
     df = df.drop(columns=["stratum", "effect"])
-    logger.info(f"Generated data: control={len(df[df['group']=='control'])}, treatment={len(df[df['group']=='treatment'])}")
+    logger.info(
+        f"Generated data: control={len(df[df['group'] == 'control'])}, treatment={len(df[df['group'] == 'treatment'])}"
+    )
     return df
 
 
 def main():
     parser = argparse.ArgumentParser(description="Generate synthetic A/B test data")
     parser.add_argument("--n_users", type=int, default=2000, help="Number of users")
-    parser.add_argument("--effect_size", type=float, default=0.08, help="Average treatment effect")
-    parser.add_argument("--heterogeneity", action="store_true", help="Enable country-level HTE")
-    parser.add_argument("--output", type=str, default="data/synthetic_data.csv", help="Output path")
+    parser.add_argument(
+        "--effect_size", type=float, default=0.08, help="Average treatment effect"
+    )
+    parser.add_argument(
+        "--heterogeneity", action="store_true", help="Enable country-level HTE"
+    )
+    parser.add_argument(
+        "--output", type=str, default="data/synthetic_data.csv", help="Output path"
+    )
     args = parser.parse_args()
 
     df = generate_data(
         n_users=args.n_users,
         effect_size=args.effect_size,
-        heterogeneity=args.heterogeneity
+        heterogeneity=args.heterogeneity,
     )
 
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
@@ -76,6 +88,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

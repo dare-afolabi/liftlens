@@ -1,4 +1,3 @@
-
 from pathlib import Path
 from typing import Literal
 
@@ -19,13 +18,7 @@ class Settings(BaseSettings):
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     api_key: str | None = None
 
-    model_config = {
-        "env_prefix": "LIFTLENS_",
-        "env_file": ".env",
-        "extra": "ignore"
-    }
+    model_config = {"env_prefix": "LIFTLENS_", "env_file": ".env", "extra": "ignore"}
 
 
 settings = Settings()
-
-

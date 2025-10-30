@@ -1,4 +1,3 @@
-
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -52,51 +51,76 @@ class ExperimentRegistry:
             conn.execute(f"PRAGMA user_version = {int(self.SCHEMA_VERSION)}")
         logger.debug(f"Registry initialized at {self.db_path}")
 
-    def start_run(self, name: str, config: dict[str, Any], tags: dict[str, str] | None = None) -> str:
+    def start_run(
+        self, name: str, config: dict[str, Any], tags: dict[str, str] | None = None
+    ) -> str:
         # Include microseconds to avoid collisions when runs start within the
         # same second (unit tests / CI can start multiple runs quickly).
         run_id = f"run_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S_%f')}_{session.seed}"
         start_time = datetime.now(timezone.utc).isoformat()
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO experiments
                 (run_id, name, start_time, status, config_json, tags_json, schema_version)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (
-                run_id, name, start_time, "running",
-                # Serialize Pydantic models / objects safely; fall back to JSON-serializing with str for unknown types
-                json.dumps(
-                    (config.model_dump() if hasattr(config, "model_dump") else (config.dict() if hasattr(config, "dict") else config)),
-                    default=str
+            """,
+                (
+                    run_id,
+                    name,
+                    start_time,
+                    "running",
+                    # Serialize Pydantic models / objects safely; fall back to JSON-serializing with str for unknown types
+                    json.dumps(
+                        (
+                            config.model_dump()
+                            if hasattr(config, "model_dump")
+                            else (config.dict() if hasattr(config, "dict") else config)
+                        ),
+                        default=str,
+                    ),
+                    json.dumps(tags or {}, default=str),
+                    self.SCHEMA_VERSION,
                 ),
-                json.dumps(tags or {}, default=str),
-                self.SCHEMA_VERSION
-            ))
+            )
         logger.info(f"Started experiment run: {run_id}")
         return run_id
 
-    def end_run(self, run_id: str, status: str = "completed", results: dict[str, Any] | None = None) -> None:
+    def end_run(
+        self,
+        run_id: str,
+        status: str = "completed",
+        results: dict[str, Any] | None = None,
+    ) -> None:
         end_time = datetime.now(timezone.utc).isoformat()
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE experiments
                 SET end_time = ?, status = ?, results_json = ?
                 WHERE run_id = ?
-            """, (
-                end_time,
-                status,
-                json.dumps(results, default=str) if results else None,
-                run_id
-            ))
+            """,
+                (
+                    end_time,
+                    status,
+                    json.dumps(results, default=str) if results else None,
+                    run_id,
+                ),
+            )
         logger.info(f"Ended experiment run {run_id}: {status}")
 
-    def log_metric(self, run_id: str, metric_name: str, value: float, step: int = 0) -> None:
+    def log_metric(
+        self, run_id: str, metric_name: str, value: float, step: int = 0
+    ) -> None:
         exp_id = self._get_experiment_id(run_id)
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO metrics (experiment_id, metric_name, value, step)
                 VALUES (?, ?, ?, ?)
-            """, (exp_id, metric_name, value, step))
+            """,
+                (exp_id, metric_name, value, step),
+            )
 
     def get_run(self, run_id: str) -> dict[str, Any] | None:
         with sqlite3.connect(self.db_path) as conn:
@@ -130,5 +154,3 @@ class ExperimentRegistry:
 
 # Global registry instance
 registry = ExperimentRegistry()
-
-

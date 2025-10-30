@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 
@@ -20,7 +19,7 @@ def setup_logging(level: str | None = None) -> None:
         sys.stderr,
         level=level,
         format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}",
-        colorize=True
+        colorize=True,
     )
 
     # JSON file (structured)
@@ -31,9 +30,7 @@ def setup_logging(level: str | None = None) -> None:
         retention="7 days",
         compression="zip",
         serialize=True,
-        level="DEBUG"
+        level="DEBUG",
     )
 
     logger.info(f"Logging initialized: level={level}, JSON logs → {log_path.parent}")
-
-

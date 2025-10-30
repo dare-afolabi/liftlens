@@ -1,5 +1,3 @@
-
-
 from typing import Any
 
 import numpy as np
@@ -8,8 +6,7 @@ from loguru import logger
 
 
 def winsorize(
-    series: pd.Series,
-    limits: tuple[float, float] = (0.01, 0.01)
+    series: pd.Series, limits: tuple[float, float] = (0.01, 0.01)
 ) -> pd.Series:
     """
     Winsorize a series at given lower and upper quantiles.
@@ -27,15 +24,14 @@ def winsorize(
     lower, upper = series.quantile([limits[0], 1 - limits[1]])
     winsorized = series.clip(lower, upper)
     # logger调试 is an accidental non-ASCII token; use logger.debug
-    logger.debug(f"Winsorized at {limits[0]*100:.1f}th and {(1-limits[1])*100:.1f}th percentiles")
+    logger.debug(
+        f"Winsorized at {limits[0] * 100:.1f}th and {(1 - limits[1]) * 100:.1f}th percentiles"
+    )
     return winsorized
 
 
 def apply_cuped(
-    df: pd.DataFrame,
-    outcome_col: str,
-    baseline_col: str,
-    group_col: str = "group"
+    df: pd.DataFrame, outcome_col: str, baseline_col: str, group_col: str = "group"
 ) -> pd.DataFrame:
     """
     Apply CUPED (Controlled-experiment Using Pre-Experiment Data) variance reduction.
@@ -83,10 +79,7 @@ def standardize(series: pd.Series) -> pd.Series:
 
 
 def apply_transforms(
-    df: pd.DataFrame,
-    config: Any,
-    baseline_col: str,
-    outcome_col: str
+    df: pd.DataFrame, config: Any, baseline_col: str, outcome_col: str
 ) -> pd.DataFrame:
     """
     Apply all configured transformations in correct order.
@@ -95,8 +88,12 @@ def apply_transforms(
 
     # Winsorize
     if hasattr(config.transform, "winsorize") and config.transform.winsorize != (0, 0):
-        df[f"{baseline_col}_win"] = winsorize(df[baseline_col], config.transform.winsorize)
-        df[f"{outcome_col}_win"] = winsorize(df[outcome_col], config.transform.winsorize)
+        df[f"{baseline_col}_win"] = winsorize(
+            df[baseline_col], config.transform.winsorize
+        )
+        df[f"{outcome_col}_win"] = winsorize(
+            df[outcome_col], config.transform.winsorize
+        )
         baseline_col = f"{baseline_col}_win"
         outcome_col = f"{outcome_col}_win"
     else:
@@ -119,5 +116,3 @@ def apply_transforms(
         df[outcome_col] = standardize(df[outcome_col])
 
     return df
-
-

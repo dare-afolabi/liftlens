@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 from loguru import logger
@@ -60,29 +59,40 @@ def run_pipeline(
         # MetricSpec.name is the user-facing identifier; func is the
         # registered function name (e.g. "mean_diff"). Call the registry
         # using the function key and preserve the user name in results.
-        value = metric_registry.call(metric.func, df, config.group_col, config.outcome_col, **metric.params)
+        value = metric_registry.call(
+            metric.func, df, config.group_col, config.outcome_col, **metric.params
+        )
         ttest = welch_ttest(df, config.outcome_col, config.group_col)
-        metrics_results.append({
-            "name": metric.name,
-            "value": value,
-            "p_value": ttest["p_value"],
-            "significant": ttest["significant"]
-        })
+        metrics_results.append(
+            {
+                "name": metric.name,
+                "value": value,
+                "p_value": ttest["p_value"],
+                "significant": ttest["significant"],
+            }
+        )
         plot = histogram(df, config.outcome_col, config.group_col)
         plots.append(plot)
 
     # Build report
     builder = ReportBuilder()
     builder.add_executive_summary(
-        key_findings=[f"{m['name']}: {'↑' if m['value']>0 else '↓'} {abs(m['value']):.1%}" for m in metrics_results],
-        recommendation="Launch treatment" if any(m["significant"] for m in metrics_results) else "No action"
+        key_findings=[
+            f"{m['name']}: {'↑' if m['value'] > 0 else '↓'} {abs(m['value']):.1%}"
+            for m in metrics_results
+        ],
+        recommendation="Launch treatment"
+        if any(m["significant"] for m in metrics_results)
+        else "No action",
     )
     builder.add_methods(config.model_dump())
     builder.add_results(metrics_results, plots)
     builder.add_diagnostics(srm_result, balance_result, {"normal": True})
 
     report_obj = getattr(config, "report", None)
-    report_format = report_obj.format if report_obj and hasattr(report_obj, "format") else "html"
+    report_format = (
+        report_obj.format if report_obj and hasattr(report_obj, "format") else "html"
+    )
     report_content = builder.render(report_format)
     # Place each run's artifacts in a run-specific subdirectory. If the caller
     # supplied an output_dir, create a subdirectory named after the run id so
@@ -96,9 +106,15 @@ def run_pipeline(
     # Write report bytes/text depending on the format
     if report_format == "pdf":
         # report_content is bytes
-        (output_dir / "report.pdf").write_bytes(report_content if isinstance(report_content, (bytes, bytearray)) else str(report_content).encode("utf-8"))
+        (output_dir / "report.pdf").write_bytes(
+            report_content
+            if isinstance(report_content, (bytes, bytearray))
+            else str(report_content).encode("utf-8")
+        )
     else:
-        (output_dir / "report.html").write_text(report_content if isinstance(report_content, str) else str(report_content))
+        (output_dir / "report.html").write_text(
+            report_content if isinstance(report_content, str) else str(report_content)
+        )
 
     # Finalize
     exp_registry.end_run(run_id, "completed", {"metrics": metrics_results})
@@ -107,13 +123,12 @@ def run_pipeline(
 
 def _default_config() -> ExperimentConfig:
     from ..config.schemas import DataSource, ExperimentConfig, MetricSpec
+
     return ExperimentConfig(
         name="default_test",
         data=DataSource(type="csv", path=Path("synthetic_data.csv")),
         baseline_col="baseline",
         outcome_col="spend_amount",
         group_col="group",
-        metrics=[MetricSpec(name="mean", type="primary", func="mean_diff")]
+        metrics=[MetricSpec(name="mean", type="primary", func="mean_diff")],
     )
-
-
