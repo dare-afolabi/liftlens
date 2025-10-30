@@ -84,6 +84,11 @@ generate-synthetic = "scripts.generate_synthetic:main"
 migrate-registry = "scripts.migrate_registry:main"
 
 [tool.ruff]
+# Ruff configuration: formatting options are under [tool.ruff.format].
+# Lint-specific options have been moved into the `lint` subsection to
+# satisfy newer ruff versions and avoid deprecation warnings.
+
+[tool.ruff.lint]
 select = ["E", "W", "F", "I", "B", "C4", "UP", "S", "BLE"]
 ignore = ["E501", "B008", "S101"]
 fixable = ["ALL"]
