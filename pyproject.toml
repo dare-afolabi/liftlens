@@ -54,7 +54,7 @@ python-dotenv = "^1.0"
 mkdocs = {version = "^1.6", optional = true}
 mkdocs-material = {version = "^9.5", optional = true}
 mkdocstrings = {extras = ["python"], version = "^0.25", optional = true}
-ruff = "^0.4"
+ruff = "0.14.2"
 black = "^24.4"
 mypy = "^1.10"
 pytest = "^8.2"
