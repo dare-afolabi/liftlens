@@ -1,6 +1,6 @@
-<img src="assets/logo.jpeg" alt="LiftLens logo">
-
 # liftlens
+
+<img src="assets/logo.jpeg" alt="LiftLens logo">
 
 <div align="center">
   <a href="https://github.com/dare-afolabi/liftlens/actions/workflows/ci.yml">
