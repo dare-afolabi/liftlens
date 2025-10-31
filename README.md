@@ -1,5 +1,3 @@
-# liftlens
-
 <img src="assets/logo.jpeg" alt="LiftLens logo">
 
 <div align="center">
@@ -22,6 +20,8 @@
     <img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-lightgrey?style=for-the-badge&logo=github-sponsors" alt="Sponsor">
   </a>
 </div>
+
+# liftlens
 
 Confirm the lift before you launch using **liftlens**, an **enterprise-grade A/B testing platform** with:
 
