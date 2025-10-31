@@ -31,7 +31,7 @@ Confirm the lift before you launch using **liftlens**, an **enterprise-grade A/B
 - **Parallel execution** (Joblib/Dask/Ray)
 - **Interactive HTML/PDF reports** with Plotly
 - **SQLite experiment registry**
-- **95%+ test coverage**, **CI/CD ready**
+- **74%+ test coverage**, **CI/CD ready**
 
 ---
 

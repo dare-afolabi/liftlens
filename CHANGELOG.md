@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Parallel processing (Joblib/Dask/Ray)
 - FastAPI server and Streamlit dashboard
 - SQLite experiment registry
-- Comprehensive tests (95%+ coverage)
+- Comprehensive tests 74%+ coverage)
 - Interactive Plotly reports (HTML/PDF)
 - Synthetic data generator with heterogeneity
 
