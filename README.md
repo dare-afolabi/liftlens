@@ -1,4 +1,5 @@
 <img src="assets/logo.jpeg" alt="LiftLens logo">
+
 # liftlens
 
 <div align="center">
