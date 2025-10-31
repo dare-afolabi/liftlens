@@ -1,4 +1,4 @@
-<img src="assets/logo.png" alt="LiftLens logo">
+<img src="assets/logo.jpeg" alt="LiftLens logo">
 
 # liftlens
 
