@@ -3,6 +3,7 @@ from functools import partial, reduce
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 def compose(*functions: Callable[..., Any]) -> Callable[..., Any]:
@@ -28,7 +29,7 @@ def partial_call(func: Callable[..., Any], **fixed_kwargs: Any) -> Callable[...,
 
 
 # Utility for safe operations
-def safe_mean(arr: np.ndarray) -> float:
+def safe_mean(arr: NDArray[Any]) -> float:
     arr = np.asarray(arr)
     if len(arr) == 0:
         return np.nan

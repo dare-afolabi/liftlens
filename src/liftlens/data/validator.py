@@ -17,8 +17,8 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
-    schema: Any = DataFrameSchema(
-        {  # type: ignore[no-untyped-call]
+    schema: Any = DataFrameSchema(  # type: ignore[no-untyped-call]
+        {
             "user_id": Column(
                 str, Check(lambda s: s.nunique() == len(s)), nullable=False
             ),

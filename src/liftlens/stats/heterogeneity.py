@@ -1,6 +1,7 @@
 from typing import Any, cast
 
 import numpy as np
+from numpy.typing import NDArray
 import pandas as pd
 from loguru import logger
 from sklearn.ensemble import RandomForestRegressor
@@ -30,7 +31,7 @@ def subgroup_analysis(
 
 def causal_forest_effect(
     df: pd.DataFrame, treatment_col: str, outcome_col: str, feature_cols: list[str]
-) -> np.ndarray:
+ ) -> NDArray[Any]:
     """
     Estimate heterogeneous treatment effects using Causal Forest.
     Returns CATE for each observation.
@@ -49,7 +50,7 @@ def causal_forest_effect(
     cf.fit(Y, T, X=X)
     cate = cf.predict(X).flatten()
     logger.info(f"Causal Forest: CATE estimated for {len(cate)} units")
-    return cast(np.ndarray, cate)
+    return cast(NDArray[Any], cate)
 
 
 def meta_learner_effect(
@@ -58,7 +59,7 @@ def meta_learner_effect(
     outcome_col: str,
     feature_cols: list[str],
     learner_type: str = "s-learner",
-) -> np.ndarray:
+ ) -> NDArray[Any]:
     """
     S-Learner, T-Learner, or X-Learner for HTE.
     """
@@ -84,4 +85,4 @@ def meta_learner_effect(
     learner.fit(Y, T, X=X)
     cate = learner.effect(X)
     logger.info(f"{learner_type.upper()}-Learner: CATE estimated")
-    return cast(np.ndarray, cate)
+    return cast(NDArray[Any], cate)
