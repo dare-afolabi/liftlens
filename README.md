@@ -1,26 +1,26 @@
 <img src="assets/logo.jpeg" alt="LiftLens logo">
 # liftlens
 
-<p align="center">
-  <a href="https://github.com/dare-afolabi/liftlens/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/dare-afolabi/liftlens/ci.yml?branch=main&style=for-the-badge" alt="Build Status" />
+<div align="center">
+  <a href="https://github.com/dare-afolabi/liftlens/actions/workflows/ci.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/dare-afolabi/liftlens/ci.yml?branch=main&style=for-the-badge" alt="Build Status">
   </a>
   <a href="https://codecov.io/gh/dare-afolabi/liftlens">
-    <img src="https://img.shields.io/codecov/c/github/dare-afolabi/liftlens?style=for-the-badge" alt="Coverage" />
+    <img src="https://img.shields.io/codecov/c/github/dare-afolabi/liftlens?style=for-the-badge" alt="Coverage">
   </a>
   <a href="https://pypi.org/project/liftlens/">
-    <img src="https://img.shields.io/pypi/v/liftlens?style=for-the-badge" alt="PyPI Version" />
+    <img src="https://img.shields.io/pypi/v/liftlens?style=for-the-badge" alt="PyPI Version">
   </a>
   <a href="https://github.com/dare-afolabi/liftlens/blob/main/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License: MIT" />
+    <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge" alt="License">
   </a>
   <a href="https://pypi.org/project/liftlens/">
-    <img src="https://img.shields.io/pypi/dm/liftlens?style=for-the-badge" alt="Downloads" />
+    <img src="https://img.shields.io/pypi/dm/liftlens?style=for-the-badge" alt="Downloads">
   </a>
   <a href="https://github.com/sponsors/dare-afolabi">
-    <img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-lightgrey?style=for-the-badge&logo=github-sponsors" alt="Sponsor" />
+    <img src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-lightgrey?style=for-the-badge&logo=github-sponsors" alt="Sponsor">
   </a>
-</p>
+</div>
 
 Confirm the lift before you launch using **liftlens**, an **enterprise-grade A/B testing platform** with:
 
