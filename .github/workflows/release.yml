@@ -62,7 +62,7 @@ jobs:
           generate_release_notes: true
           files: dist/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
   docker:
     name: Publish Docker Image
@@ -76,7 +76,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_PAT }}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
