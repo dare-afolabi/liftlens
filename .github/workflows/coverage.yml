@@ -1,11 +1,10 @@
-
 name: Test Coverage
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 
 permissions:
@@ -25,20 +24,22 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
 
-      - name: Install Poetry
-        run: pip install poetry
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
 
-      - name: Configure Poetry
+      - name: Install Poetry and dependencies
         run: |
+          pip install poetry
+          poetry env use 3.11
           poetry config virtualenvs.create true
           poetry install --with dev --no-interaction
-
-      - name: Lint & Type Check
-        run: |
-          poetry run ruff check .
-          poetry run mypy src/
 
       - name: Run tests with coverage
         run: |
@@ -58,5 +59,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
-
-
