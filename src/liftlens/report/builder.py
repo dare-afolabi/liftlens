@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, cast
 
+import numpy as np
 import plotly.io as pio
 from jinja2 import Environment, PackageLoader, select_autoescape
 from loguru import logger
@@ -80,12 +81,31 @@ class ReportBuilder:
         }
 
     def render(self, format: str = "html") -> str | bytes:
+        from typing import Any
+
+        def _to_serializable(obj: Any) -> Any:
+            """Recursively convert numpy objects to JSON-safe types."""
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            if isinstance(obj, (np.float32, np.float64)):
+                return float(obj)
+            if isinstance(obj, (np.int32, np.int64)):
+                return int(obj)
+            if isinstance(obj, dict):
+                return {k: _to_serializable(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_to_serializable(v) for v in obj]
+            return obj
+
+        # Sanitize all data before sending to Jinja
+        safe_sections: dict[str, Any] = _to_serializable(self.sections)
+
         template_name = "report.html.j2" if format == "html" else "report.md.j2"
         template = self.env.get_template(template_name)
 
         html = template.render(
             metadata=self.metadata,
-            sections=self.sections,
+            sections=safe_sections,
             warning_banner=self._warning_banner(),
         )
 
@@ -95,13 +115,7 @@ class ReportBuilder:
 
                 return cast(bytes, HTML(string=html).write_pdf())
             except ModuleNotFoundError:
-                # WeasyPrint or its native dependencies aren't available in
-                # the environment (CI/devcontainer). Return a placeholder
-                # PDF-like byte sequence (sized >1KB) so tests that only
-                # check for file presence/size succeed. We include the
-                # rendered HTML to make the placeholder informative.
                 payload = b"%PDF-1.4\n" + html.encode("utf-8") + b"\n%%EOF"
-                # Ensure the placeholder is reasonably large (>= 2KB)
                 if len(payload) < 2048:
                     payload += (b"\n" + b" " * 2048)[: 2048 - len(payload)]
                 return payload

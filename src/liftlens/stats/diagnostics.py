@@ -10,24 +10,29 @@ def normality_test(series: pd.Series, method: str = "shapiro") -> dict[str, Any]
     """Shapiro-Wilk or Anderson-Darling normality test."""
     if len(series) < 3:
         return {"error": "n < 3"}
+
     if method == "shapiro":
-        stat, p = stats.shapiro(series)
+        stat, p_value = stats.shapiro(series)
+        normal = p_value > 0.05
     elif method == "anderson":
         result = stats.anderson(series)
         stat = result.statistic
-        p = result.significance_level[2]  # approximate
+        p_value = None  # Anderson does not return p-value
+        normal = stat < result.critical_values[2]  # use 3rd significance level (~5%)
     else:
         raise ValueError("method must be 'shapiro' or 'anderson'")
 
-    result = {
+    logger.debug(
+        f"Normality ({method}): stat={stat:.3f}, "
+        f"p={p_value if p_value is not None else 'N/A'}"
+    )
+
+    return {
         "method": method,
         "statistic": float(stat),
-        "p_value": float(p) if "p" in locals() else None,
-        "normal": p > 0.05 if "p" in locals() else stat < result.critical_values[2],
+        "p_value": p_value if p_value is not None else None,
+        "normal": normal,
     }
-    logger.debug(f"Normality ({method}): stat={stat:.3f}, p={p:.3f}")
-    return result
-
 
 def variance_test(
     df: pd.DataFrame, metric_col: str, group_col: str = "group"
@@ -36,7 +41,7 @@ def variance_test(
     control = df[df[group_col] == "control"][metric_col]
     treatment = df[df[group_col] == "treatment"][metric_col]
     stat, p = stats.levene(control, treatment)
-    result = {
+    result: dict[str, Any] = {
         "method": "Levene",
         "statistic": float(stat),
         "p_value": float(p),
@@ -60,20 +65,19 @@ def parallel_trends_test(
     df_pre: pd.DataFrame, df_post: pd.DataFrame, group_col: str, metric_col: str
 ) -> dict[str, Any]:
     """Test for parallel trends assumption in DiD."""
-    # Simple slope comparison
     pre_control = df_pre[df_pre[group_col] == "control"][metric_col]
     pre_treatment = df_pre[df_pre[group_col] == "treatment"][metric_col]
     post_control = df_post[df_post[group_col] == "control"][metric_col]
     post_treatment = df_post[df_post[group_col] == "treatment"][metric_col]
 
-    slope_control = post_control.mean() - pre_control.mean()
-    slope_treatment = post_treatment.mean() - pre_treatment.mean()
-    diff_in_slopes = slope_treatment - slope_control
+    slope_control = float(post_control.mean() - pre_control.mean())
+    slope_treatment = float(post_treatment.mean() - pre_treatment.mean())
+    diff_in_slopes = float(slope_treatment - slope_control)
 
-    result = {
-        "slope_control": float(slope_control),
-        "slope_treatment": float(slope_treatment),
-        "diff_in_slopes": float(diff_in_slopes),
+    result: dict[str, Any] = {
+        "slope_control": slope_control,
+        "slope_treatment": slope_treatment,
+        "diff_in_slopes": diff_in_slopes,
         "parallel": abs(diff_in_slopes) < 0.01 * pre_control.mean(),
     }
     logger.info(

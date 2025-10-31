@@ -1,9 +1,9 @@
 from typing import Any, cast
 
 import numpy as np
-from numpy.typing import NDArray
 import pandas as pd
 from loguru import logger
+from numpy.typing import NDArray
 from sklearn.ensemble import RandomForestRegressor
 
 

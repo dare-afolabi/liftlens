@@ -1,4 +1,3 @@
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -17,7 +16,7 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
-    schema: Any = DataFrameSchema(  # type: ignore[no-untyped-call]
+    schema = DataFrameSchema(
         {
             "user_id": Column(
                 str, Check(lambda s: s.nunique() == len(s)), nullable=False
@@ -25,7 +24,8 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
             "baseline": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
             "outcome": Column(float, Check(lambda x: x.ge(0).all()), nullable=False),
             "group": Column(
-                str, Check(lambda s: set(s.unique()).issubset({"control", "treatment"}))
+                str,
+                Check(lambda s: set(s.unique()).issubset({"control", "treatment"})),
             ),
         },
         strict=True,
@@ -41,7 +41,7 @@ def validate_schema(df: pd.DataFrame, source_type: str) -> None:
 
 def check_srm(
     df: pd.DataFrame, group_col: str = "group", alpha: float = 0.01
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """
     Sample Ratio Mismatch (SRM) detection using chi-squared test.
 
@@ -55,7 +55,7 @@ def check_srm(
     chi2, p_value = stats.chisquare(observed, expected)
     is_srm = p_value < alpha
 
-    result = {
+    result: dict[str, object] = {
         "test": "chi-squared",
         "chi2": float(chi2),
         "p_value": float(p_value),
@@ -75,7 +75,7 @@ def check_srm(
 
 def check_balance(
     df: pd.DataFrame, baseline_col: str, group_col: str = "group", alpha: float = 0.05
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """
     Covariate balance check using standardized mean difference (SMD) and t-test.
     """
@@ -85,7 +85,7 @@ def check_balance(
     smd = _standardized_mean_difference(control, treatment)
     t_stat, p_value = stats.ttest_ind(control, treatment, equal_var=False)
 
-    result = {
+    result: dict[str, object] = {
         "smd": float(smd),
         "smd_interpretation": _interpret_smd(abs(smd)),
         "t_test_p_value": float(p_value),
@@ -104,7 +104,7 @@ def _standardized_mean_difference(a: pd.Series, b: pd.Series) -> float:
     """Calculate Cohen's d for two groups."""
     diff = a.mean() - b.mean()
     pooled_std = np.sqrt((a.var() + b.var()) / 2)
-    return diff / pooled_std if pooled_std > 0 else 0.0
+    return float(diff / pooled_std) if pooled_std > 0 else 0.0
 
 
 def _interpret_smd(smd: float) -> str:
