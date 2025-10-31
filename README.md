@@ -1,4 +1,13 @@
+<img src="logo.svg" alt="LiftLens logo">
+
 # liftlens
+
+![Build Status](https://img.shields.io/github/actions/workflow/status/dare-afolabi/liftlens/ci.yml?branch=main&style=for-the-badge)
+![Coverage](https://img.shields.io/codecov/c/github/dare-afolabi/liftlens?style=for-the-badge)
+![PyPI version](https://img.shields.io/pypi/v/liftlens?style=for-the-badge)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+![Downloads](https://img.shields.io/pypi/dm/liftlens?style=for-the-badge)
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-lightgrey?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/dare-afolabi)
 
 Confirm the lift before you launch using **liftlens**, an **enterprise-grade A/B testing platform** with:
 
