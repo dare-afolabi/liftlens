@@ -14,6 +14,8 @@ jobs:
     strategy:
       matrix:
         python-version: [3.11, 3.12]
+    env:
+      PYTHONPATH: src
 
     steps:
       - name: Checkout repository
@@ -43,9 +45,8 @@ jobs:
           poetry run mypy src --ignore-missing-imports --pretty
 
       - name: Run tests
-        env:
-          PYTHONPATH: src
         run: |
+          # Run tests from repository root; PYTHONPATH is set at job level
           poetry run pytest -q
 
       - name: Build distributions
