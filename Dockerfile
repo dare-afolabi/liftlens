@@ -25,10 +25,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 - \
 # Copy source
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
-COPY liftlens ./liftlens
+COPY src/liftlens ./liftlens
 COPY scripts ./scripts
 COPY examples ./examples
-COPY data ./data
 
 # Install dependencies
 RUN poetry install --only main --no-root --extras "parallel"
