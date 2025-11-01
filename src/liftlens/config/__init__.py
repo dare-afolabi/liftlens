@@ -1,4 +1,6 @@
-"""Configuration module."""
+"""Configuration subpackage for LiftLens."""
+
+from __future__ import annotations
 
 from .schemas import (
     DataSource,
