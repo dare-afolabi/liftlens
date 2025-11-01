@@ -29,7 +29,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Cache Poetry dependencies
+      - name: Cache Poetry
         uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry
@@ -37,14 +37,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      - name: Install Poetry and dependencies
+      - name: Install Poetry
         run: |
           pip install poetry
+          poetry --version
+
+      - name: Install package + dev tools
+        run: |
           poetry env use 3.11
           poetry config virtualenvs.create true
-          poetry install --no-interaction --without dev
+          # Install *with* dev group (twine, build, etc.)
+          poetry install --no-interaction --with dev
 
-      - name: Validate and Build package
+      - name: Validate, build & check distribution
         run: |
           poetry check
           poetry build
@@ -57,7 +62,7 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: dist/*
