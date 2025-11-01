@@ -30,7 +30,7 @@ COPY scripts ./scripts
 COPY examples ./examples
 
 # Install dependencies
-RUN poetry install --only main --no-root --extras "parallel"
+RUN poetry install --only main --no-root
 
 # === STAGE 2: Runtime ===
 FROM python:3.11-slim AS runtime
