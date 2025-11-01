@@ -1,26 +1,45 @@
 """Metrics package: register built-in metrics into the global registry.
 
-This module imports metric implementations and registers them with the
-central `MetricRegistry` instance so they are available via simple names
-like ``mean`` used in configuration and tests.
+This module registers all built-in metrics into the central MetricRegistry
+when explicitly imported (e.g. from liftlens.metrics).
+It avoids side effects at package import time (e.g. when only running
+`liftlens --help`), by registering lazily on first access.
 """
 
-from .monitoring import cvm_test, ks_test, psi
-from .primary import conversion_rate, mean_diff, sum_metric
+from __future__ import annotations
+import importlib
+
 from .registry import registry
-from .robust import huber_mean, mad, trimmed_mean
 
-# Primary metrics
-registry.register("mean_diff", mean_diff, alias="mean")
-registry.register("conversion_rate", conversion_rate, alias="cr")
-registry.register("sum", sum_metric)
+__all__ = ["registry", "ensure_metrics_registered"]
 
-# Robust metrics
-registry.register("trimmed_mean", trimmed_mean)
-registry.register("huber_mean", huber_mean)
-registry.register("mad", mad)
+_metrics_registered = False
 
-# Monitoring / diagnostics
-registry.register("psi", psi)
-registry.register("ks_test", ks_test)
-registry.register("cvm_test", cvm_test)
+
+def ensure_metrics_registered() -> None:
+    """Register all built-in metrics if not already registered."""
+    global _metrics_registered
+    if _metrics_registered:
+        return
+
+    # Lazy import metric implementations
+    primary = importlib.import_module(".primary", __name__)
+    robust = importlib.import_module(".robust", __name__)
+    monitoring = importlib.import_module(".monitoring", __name__)
+
+    # Primary metrics
+    registry.register("mean_diff", primary.mean_diff, alias="mean")
+    registry.register("conversion_rate", primary.conversion_rate, alias="cr")
+    registry.register("sum", primary.sum_metric)
+
+    # Robust metrics
+    registry.register("trimmed_mean", robust.trimmed_mean)
+    registry.register("huber_mean", robust.huber_mean)
+    registry.register("mad", robust.mad)
+
+    # Monitoring / diagnostics
+    registry.register("psi", monitoring.psi)
+    registry.register("ks_test", monitoring.ks_test)
+    registry.register("cvm_test", monitoring.cvm_test)
+
+    _metrics_registered = True
