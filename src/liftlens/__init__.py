@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import importlib
+from typing import Any
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "cli",
@@ -22,7 +23,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> Any:
     """Lazily import submodules to avoid unintended prints during top-level import."""
     if name in __all__:
         return importlib.import_module(f".{name}", __name__)
