@@ -1,6 +1,7 @@
 """liftlens: An Enterprise-grade A/B Testing Framework."""
 
 from __future__ import annotations
+
 import importlib
 
 __version__ = "0.1.0"

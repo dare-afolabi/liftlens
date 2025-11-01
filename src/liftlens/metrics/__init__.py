@@ -1,38 +1,49 @@
-"""Metrics package: register built-in metrics into the global registry.
+"""Metrics package – lazy registration of all built-in metrics.
 
-This module registers all built-in metrics into the central MetricRegistry
-when explicitly imported (e.g. from liftlens.metrics).
-It avoids side effects at package import time (e.g. when only running
-`liftlens --help`), by registering lazily on first access.
+The registry is populated **only the first time** the package is touched
+(e.g. `from liftlens.metrics import registry` or `ensure_metrics_registered()`).
+This avoids side-effects when the CLI is only showing `--help`.
 """
 
 from __future__ import annotations
+
 import importlib
+from typing import Final
 
 from .registry import registry
 
 __all__ = ["registry", "ensure_metrics_registered"]
 
-_metrics_registered = False
+# --------------------------------------------------------------------------- #
+# Private flag – guarantees registration happens exactly once per process
+# --------------------------------------------------------------------------- #
+_metrics_registered: Final[bool] = False   # will be flipped to True after first run
 
 
 def ensure_metrics_registered() -> None:
-    """Register all built-in metrics if not already registered."""
+    """Register every built-in metric into the global ``registry``."""
+    # pylint: disable=global-statement
     global _metrics_registered
     if _metrics_registered:
         return
 
-    # Lazy import metric implementations
+    # ------------------------------------------------------------------- #
+    # 1. Import the implementation modules (this executes their @register)
+    # ------------------------------------------------------------------- #
     primary = importlib.import_module(".primary", __name__)
     robust = importlib.import_module(".robust", __name__)
     monitoring = importlib.import_module(".monitoring", __name__)
 
-    # Primary metrics
+    # ------------------------------------------------------------------- #
+    # 2. Explicitly register the functions that are **not** decorated
+    #     (decorators are still executed because the module is imported)
+    # ------------------------------------------------------------------- #
+    # Primary
     registry.register("mean_diff", primary.mean_diff, alias="mean")
     registry.register("conversion_rate", primary.conversion_rate, alias="cr")
     registry.register("sum", primary.sum_metric)
 
-    # Robust metrics
+    # Robust
     registry.register("trimmed_mean", robust.trimmed_mean)
     registry.register("huber_mean", robust.huber_mean)
     registry.register("mad", robust.mad)
@@ -42,4 +53,7 @@ def ensure_metrics_registered() -> None:
     registry.register("ks_test", monitoring.ks_test)
     registry.register("cvm_test", monitoring.cvm_test)
 
+    # ------------------------------------------------------------------- #
+    # Mark as done – subsequent calls are no-ops
+    # ------------------------------------------------------------------- #
     _metrics_registered = True

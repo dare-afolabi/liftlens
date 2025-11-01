@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "liftlens"
-version = "0.1.0"
+version = "0.1.1"
 description = "An Enterprise-grade A/B Testing Framework with CUPED, SRM, Sequential Testing, FastAPI, Streamlit"
 authors = ["Dare Afolabi <dare.afolabi@outlook.com>"]
 license = "Apache-2.0"
@@ -144,6 +144,11 @@ python_functions = ["test_*"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: integration tests"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:pydyf.*",
+    "ignore::FutureWarning:pandas.*",
+    "ignore::PendingDeprecationWarning:starlette.*"
 ]
 
 

@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import typer
+import uvicorn
 from loguru import logger
 
-from .api.server import app as fastapi_app
-from .workflows.pipeline import run_pipeline
+from liftlens.api.server import app as fastapi_app
+
+# ------------------------------------------------------------------ #
+# Absolute imports – always resolve correctly
+# ------------------------------------------------------------------ #
+from liftlens.metrics import ensure_metrics_registered
+from liftlens.workflows.pipeline import run_pipeline
 
 app = typer.Typer(
     name="liftlens",
@@ -30,21 +38,34 @@ def run(
 ) -> None:
     """Run the full A/B test pipeline."""
     logger.info("Starting A/B test pipeline")
-    # Accept either a positional config argument or the --config option.
+
+    # ------------------------------------------------------------------ #
+    # 1. Ensure all built-in metrics are registered
+    # ------------------------------------------------------------------ #
+    ensure_metrics_registered()
+
+    # ------------------------------------------------------------------ #
+    # 2. Resolve config path (positional or --config)
+    # ------------------------------------------------------------------ #
     cfg = config or config_arg
+    if cfg is None:
+        raise typer.BadParameter("Config path is required (use --config or positional argument)")
+
+    # ------------------------------------------------------------------ #
+    # 3. Run pipeline
+    # ------------------------------------------------------------------ #
     run_pipeline(config_path=cfg, input_path=input_path, output_dir=output_dir)
-    # Provide an explicit stdout message for CLI integration tests that
-    # expect progress/result information on stdout.
+
+    # ------------------------------------------------------------------ #
+    # 4. Explicit stdout for test harnesses
+    # ------------------------------------------------------------------ #
     print("Pipeline complete")
 
 
 @app.command()
 def serve() -> None:
     """Start the FastAPI server."""
-    import uvicorn
-
     logger.info("Starting FastAPI server on http://0.0.0.0:8000")
-    # Intentionally bind to all interfaces for local development/CLI usage.
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8000, log_level="info")  # noqa: S104
 
 
@@ -64,7 +85,7 @@ def dashboard() -> None:
             "liftlens/api/dashboard.py",
             "--server.port=8501",
         ]
-    )  # noqa: S603
+    )
 
 
 if __name__ == "__main__":

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from pathlib import Path
+
 from loguru import logger
 
 from ..config.schemas import ExperimentConfig
@@ -6,6 +9,7 @@ from ..core.registry import registry as exp_registry
 from ..data.io import load_data
 from ..data.transform import apply_transforms
 from ..data.validator import check_balance, check_srm
+from ..metrics import ensure_metrics_registered
 from ..metrics.registry import registry as metric_registry
 from ..report.builder import ReportBuilder
 from ..stats.inference import welch_ttest
@@ -20,6 +24,8 @@ def run_pipeline(
 ) -> None:
     """Orchestrate full A/B test pipeline."""
     logger.info("Starting A/B test pipeline")
+
+    ensure_metrics_registered()
 
     # Load config
     if isinstance(config_path, ExperimentConfig):
