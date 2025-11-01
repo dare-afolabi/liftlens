@@ -132,3 +132,7 @@ filterwarnings = [
     "ignore::FutureWarning:pandas.*",
     "ignore::PendingDeprecationWarning:starlette.*"
 ]
+
+[tool.poetry.extras]
+parallel = ["dask", "ray"]
+docs = ["mkdocs", "mkdocs-material", "mkdocstrings"]
